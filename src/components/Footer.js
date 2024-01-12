@@ -13,6 +13,9 @@ function Footer({ onAddMessage }) {
   };
 
   const handleKeyDown = (e) => {
+    if (e.nativeEvent.isComposing) {
+      return;
+    }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(e);
@@ -38,7 +41,7 @@ function Footer({ onAddMessage }) {
               className="m-0 w-full resize-none border-0 bg-transparent p-0 pr-7 focus:ring-0 focus-visible:ring-0 dark:bg-transparent outline-none overflow-y-hidden h-[23px]"
             ></textarea>
             <button
-              type="submit"
+              onClick={handleSubmit}
               className="absolute p-2 rounded-md text-white bg-blue-500 bottom-1.5 right-1 md:bottom-2.5 md:right-2 hover:bg-blue-700"
             >
               <PlaneIcon />

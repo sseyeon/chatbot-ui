@@ -1,6 +1,8 @@
 import { React, useEffect, useRef } from "react";
 import { SunIcon, UserIcon } from "../constants";
 import Genie from "../assets/images/genie.png";
+import ReactMarkdown from "react-markdown";
+
 function Feed({ messages, onAddMessage }) {
   const messageEndRef = useRef(null);
 
@@ -41,7 +43,7 @@ function Feed({ messages, onAddMessage }) {
       <div className="flex flex-col items-center text-sm h-full md:h-screen">
         <div className="text-gray-800 w-full md:max-w-2xl lg:max-w-3xl md:h-full md:flex px-6">
           {messages.length > 0 ? (
-            <div className="pb-32 pt-5 space-y-5 w-[100%] mx-auto relative">
+            <div className="pt-5 space-y-5 w-[100%] mx-auto relative">
               {" "}
               {messages.map((message, index) => (
                 <div key={index} className="w-full">
@@ -50,9 +52,10 @@ function Feed({ messages, onAddMessage }) {
                       <div className="p-2 w-12 h-12 rounded-full">
                         <UserIcon />
                       </div>
-                      <p className="rounded-lg p-3 w-full border text-sm">
-                        {message}
-                      </p>
+                      <div className="rounded-lg p-3 w-full border text-sm leading-6">
+                        {/* {message} */}
+                        <ReactMarkdown>{message}</ReactMarkdown>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex items-center gap-x-2">
@@ -63,9 +66,10 @@ function Feed({ messages, onAddMessage }) {
                           className="w-full h-full"
                         />
                       </div>
-                      <p className="rounded-lg p-3 w-full border border-blue-500 text-sm">
-                        {message}
-                      </p>
+                      <div className="rounded-lg p-3 w-full border border-blue-500 text-sm leading-6">
+                        {/* {message} */}
+                        <ReactMarkdown>{message}</ReactMarkdown>
+                      </div>
                     </div>
                   )}
                 </div>
