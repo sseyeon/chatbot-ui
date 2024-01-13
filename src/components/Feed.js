@@ -1,9 +1,17 @@
-import { React, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { SunIcon, UserIcon } from "../constants";
 import Genie from "../assets/images/genie.png";
+import MagicLamp from "../assets/images/magic-lamp.png";
 import ReactMarkdown from "react-markdown";
 
-function Feed({ messages, onAddMessage }) {
+function Feed({
+  messages,
+  onAddMessage,
+  sources,
+  onAddSources,
+  isLoading,
+  setIsLoading,
+}) {
   const messageEndRef = useRef(null);
 
   // 데이터 배열을 상수로 분리
@@ -26,8 +34,45 @@ function Feed({ messages, onAddMessage }) {
     },
   ];
 
-  const handleSubTitleClick = (subTitle) => {
+  const handleSubTitleClick = async (subTitle) => {
     onAddMessage(subTitle);
+    const dataToSend = {
+      query: subTitle,
+      history: {
+        user: messages.length > 0 ? messages[messages.length - 2] : "",
+        bot: messages.length > 0 ? messages[messages.length - 1] : "",
+        source: [],
+      },
+    };
+    setIsLoading(true); // Start loading
+
+    try {
+      // Send the POST request
+      const response = await fetch(
+        "http://esg-chat.bigleader.net/chatbot/main",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(dataToSend),
+        }
+      );
+
+      // Handle the response
+      if (response.ok) {
+        const responseData = await response.json();
+        onAddMessage(responseData.history[0].bot);
+        onAddSources(responseData.history[0].sources);
+        // Here, you can do something with the response
+      } else {
+        console.error("Failed to send message:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error while sending message:", error);
+    } finally {
+      setIsLoading(false); // Stop loading regardless of result
+    }
   };
 
   const scrollToBottom = () => {
@@ -67,13 +112,41 @@ function Feed({ messages, onAddMessage }) {
                         />
                       </div>
                       <div className="rounded-lg p-3 w-full border border-blue-500 text-sm leading-6">
-                        {/* {message} */}
                         <ReactMarkdown>{message}</ReactMarkdown>
+                        <div className="flex flex-row flex-wrap gap-2 mt-2">
+                          {Array.isArray(sources[Math.floor(index / 2)]) &&
+                            sources[Math.floor(index / 2)].map(
+                              (source, srcIndex) => (
+                                <span
+                                  key={srcIndex}
+                                  className="bg-[#E5ECF6] p-1 rounded-md text-xs"
+                                >
+                                  📚 {source}
+                                </span>
+                              )
+                            )}
+                        </div>
                       </div>
                     </div>
                   )}
                 </div>
               ))}
+              {isLoading && (
+                <div className="w-full">
+                  <div className="flex items-center gap-x-2">
+                    <div className=" p-2 w-12 h-12 rounded-full">
+                      <img
+                        src={MagicLamp}
+                        alt="Bigleader Logo"
+                        className="w-full h-full"
+                      />
+                    </div>
+                    <div className="rounded-lg p-3 w-full border border-yellow-500 fading-effect text-sm leading-6">
+                      답변을 준비중입니다.
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div>

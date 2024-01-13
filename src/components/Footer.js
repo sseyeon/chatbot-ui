@@ -1,14 +1,51 @@
 import React, { useState } from "react";
-import { PlaneIcon, UserIcon } from "../constants";
+import { PlaneIcon } from "../constants";
 
-function Footer({ onAddMessage }) {
+function Footer({ messages, onAddMessage, onAddSources, setIsLoading }) {
   const [inputMessage, setInputMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    onAddMessage(inputMessage);
+    setInputMessage(""); // 입력 필드 초기화
+
     e.preventDefault();
     if (inputMessage.trim() !== "") {
-      onAddMessage(inputMessage);
-      setInputMessage(""); // 입력 필드 초기화
+      const dataToSend = {
+        query: inputMessage,
+        history: {
+          user: messages.length > 0 ? messages[messages.length - 2] : "",
+          bot: messages.length > 0 ? messages[messages.length - 1] : "",
+          source: [],
+        },
+      };
+      setIsLoading(true); // Start loading
+      try {
+        // Send the POST request
+        const response = await fetch(
+          "http://esg-chat.bigleader.net/chatbot/main",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dataToSend),
+          }
+        );
+
+        // Handle the response
+        if (response.ok) {
+          const responseData = await response.json();
+          onAddMessage(responseData.history[0].bot);
+          onAddSources(responseData.history[0].sources);
+          // Here, you can do something with the response
+        } else {
+          console.error("Failed to send message:", response.statusText);
+        }
+      } catch (error) {
+        console.error("Error while sending message:", error);
+      } finally {
+        setIsLoading(false); // Stop loading regardless of result
+      }
     }
   };
 
@@ -26,11 +63,6 @@ function Footer({ onAddMessage }) {
     <div className="text-center p-3">
       <form className="flex justify-center items-center pt-4 lg:mx-auto lg:max-w-3xl">
         <div className="relative flex h-full flex-1 md:flex-col">
-          <div className="ml-1 mt-1.5 md:w-full md:m-auto md:flex md:mb-2 gap-2 justify-center">
-            <div className="text-gray-100 p-1 md:hidden">
-              <UserIcon />
-            </div>
-          </div>
           {/* Input */}
           <div className="flex flex-col w-full py-2 pl-3 flex-grow md:py-3 md:pl-4 relative border border-black/10 bg-white dark:border-gray-900/50 rounded-md bg-[rgba(64,65,79,var(--tw-bg-opacity))]">
             <textarea

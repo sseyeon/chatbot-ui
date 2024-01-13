@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  DiscordIcon,
-  ExternalLinkIcon,
-  LogOutIcon,
-  SunIcon,
-} from "../constants";
+import { ExternalLinkIcon, LogOutIcon } from "../constants";
 import BigleaderLogo from "../assets/images/logon_bl.png";
 import Genie from "../assets/images/genie.png";
 

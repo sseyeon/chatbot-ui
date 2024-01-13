@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Feed from "./components/Feed";
 import Footer from "./components/Footer";
@@ -6,10 +6,17 @@ import { ShareIcon } from "./constants";
 
 function App() {
   const [messages, setMessages] = useState([]);
+  const [sources, setSources] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const addMessage = (newMessage) => {
-    setMessages([...messages, newMessage]);
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
   };
+
+  const addSources = (newSources) => {
+    setSources((prevSources) => [...prevSources, newSources]);
+  };
+  useEffect(() => {}, [sources]);
 
   return (
     <div className="flex h-screen">
@@ -20,8 +27,20 @@ function App() {
             <ShareIcon />
           </button>
         </div>
-        <Feed messages={messages} onAddMessage={addMessage} />
-        <Footer onAddMessage={addMessage} />
+        <Feed
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          messages={messages}
+          onAddMessage={addMessage}
+          sources={sources}
+          onAddSources={addSources}
+        />
+        <Footer
+          setIsLoading={setIsLoading}
+          messages={messages}
+          onAddMessage={addMessage}
+          onAddSources={addSources}
+        />
       </div>
     </div>
   );
